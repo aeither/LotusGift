@@ -1,4 +1,3 @@
-// Trading Engine API Usage Examples (TypeScript)
 import 'dotenv/config'
 import {
     createWalletClient,
@@ -158,7 +157,7 @@ async function approveTokenIfNeeded(
         args: [spenderAddress as any, BigInt(amount)],
     })
 
-    const tx = await walletClient.writeContract(request)
+    const tx = await walletClient.writeContract({ ...request, account: userAccount })
 
     console.log('Approval transaction sent:', tx)
 
