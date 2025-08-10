@@ -1,0 +1,33 @@
+{
+  "name": "minikit-app",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Mini App on Base using Coinbase OnchainKit MiniKit",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@coinbase/onchainkit": "latest",
+    "@tanstack/react-query": "^5.51.9",
+    "@xmtp/frames-validator": "^0.6.3",
+    "graphql": "^16.9.0",
+    "graphql-request": "^6.1.0",
+    "next": "14.2.5",
+    "pino-pretty": "^11.3.0",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "viem": "2.33.3",
+    "wagmi": "2.16.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "eslint": "^8.57.0",
+    "eslint-config-next": "14.2.5",
+    "typescript": "^5.5.3"
+  }
+}

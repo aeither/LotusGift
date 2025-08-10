@@ -1,26 +1,38 @@
 {
-    "name": "gud-tade",
-    "version": "1.0.0",
-    "type": "module",
-    "description": "",
-    "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1"
-    },
-    "repository": {
-      "type": "git",
-      "url": "git+https://github.com/zircuit-labs/trading-engine-workshop.git"
-    },
-    "author": "",
-    "license": "ISC",
-    "bugs": {
-      "url": "https://github.com/zircuit-labs/trading-engine-workshop/issues"
-    },
-    "homepage": "https://github.com/zircuit-labs/trading-engine-workshop#readme",
-    "dependencies": {
-      "dotenv": "^16.4.5",
-      "viem": "^2.33.2"
-    },
-    "devDependencies": {
-      "@types/node": "^22.7.5"
-    }
+  "name": "ethvietnam25",
+  "version": "1.0.0",
+  "type": "module",
+  "private": true,
+  "description": "ETHVietnam25 app with Bitte AI Hono backend and trading scripts",
+  "scripts": {
+    "dev": "concurrently -k -n server,playground -c blue,magenta \"tsx watch backend/server.ts\" \"cross-env BITTE_AGENT_URL=http://localhost:3001 make-agent dev --port 3030\"",
+    "build": "tsc",
+    "start": "node dist/backend/server.js",
+    "deploy": "make-agent deploy",
+    "test": "echo \"No tests configured\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zircuit-labs/trading-engine-workshop.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/zircuit-labs/trading-engine-workshop/issues"
+  },
+  "homepage": "https://github.com/zircuit-labs/trading-engine-workshop#readme",
+  "dependencies": {
+    "@hono/node-server": "^1.13.6",
+    "dotenv": "^16.4.5",
+    "hono": "^4.6.12",
+    "viem": "^2.33.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "make-agent": "^0.3.1",
+    "tsx": "^4.15.7",
+    "typescript": "^5.5.4"
   }
+}

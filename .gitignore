@@ -7,3 +7,23 @@ yarn.lock
 todo.md
 context.txt
 
+
+# Next.js
+# Ignore Next.js build output and local config across the repo (e.g., in `frontend/`)
+**/.next/
+**/out/
+**/.vercel/
+**/next-env.d.ts
+**/.eslintcache
+
+# Logs
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Env files by environment
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local

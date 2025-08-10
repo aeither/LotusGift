@@ -5,6 +5,7 @@ import {
   encodeFunctionData,
   erc20Abi,
   getAddress,
+  isAddress,
   http,
 } from 'viem'
 import { privateKeyToAccount } from 'viem/accounts'
@@ -113,19 +114,25 @@ async function apiRequest(endpoint: string, options: RequestInit = {}) {
     Authorization: `Bearer ${API_KEY}`,
     ...(options.headers || {}),
   }
-  const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers })
-  if (!response.ok) {
-    const errorText = await response.text()
-    let errorMessage = `HTTP ${response.status}: ${response.statusText}`
-    try {
-      const errorData = JSON.parse(errorText)
-      errorMessage = (errorData as any).error || (errorData as any).message || errorMessage
-    } catch {
-      errorMessage = errorText || errorMessage
+  try {
+    const response = await fetch(`${API_BASE_URL}${endpoint}`, { ...options, headers })
+    if (!response.ok) {
+      const errorText = await response.text()
+      console.error('API Error Response:', errorText)
+      let errorMessage = `HTTP ${response.status}: ${response.statusText}`
+      try {
+        const errorData = JSON.parse(errorText)
+        errorMessage = (errorData as any).error || (errorData as any).message || errorMessage
+      } catch {
+        errorMessage = errorText || errorMessage
+      }
+      throw new Error(errorMessage)
     }
-    throw new Error(errorMessage)
+    return response.json()
+  } catch (error) {
+    console.error('API Request failed:', error)
+    throw error
   }
-  return response.json()
 }
 
 async function getTradeStatus(txHash: string) {
@@ -142,21 +149,41 @@ async function waitUntilTradeIsCompleted(txHash: string) {
 }
 
 async function getTradeEstimate(quoteRequest: any) {
-  const response = await apiRequest('/order/estimate', {
-    method: 'POST',
-    body: JSON.stringify(quoteRequest),
-  })
-
-  const { trade, tx } = response.data
-
-  return {
-    tradeId: trade.tradeId,
-    expectedAmount: trade.destTokenAmount,
-    minExpectedAmount: trade.destTokenMinAmount,
-    txData: tx,
-    fees: trade.fees,
-    eip712: trade.eip712, // crucial for gasless
+  console.log('Quote request:', JSON.stringify(quoteRequest, null, 2))
+  try {
+    const response = await apiRequest('/order/estimate', {
+      method: 'POST',
+      body: JSON.stringify(quoteRequest),
+    })
+    if (!response?.data) throw new Error('No data in response')
+    const { trade, tx } = response.data
+    if (!trade || !tx) throw new Error('Invalid response structure')
+    return {
+      tradeId: trade.tradeId,
+      expectedAmount: trade.destTokenAmount,
+      minExpectedAmount: trade.destTokenMinAmount,
+      txData: tx,
+      fees: trade.fees,
+      eip712: trade.eip712, // crucial for gasless
+    }
+  } catch (error) {
+    console.error('Trade estimate error:', error)
+    throw error
   }
+}
+
+// Address normalization for potentially padded/duplicated-0x inputs from some providers
+const normalizeAndChecksumAddress = (value: string): `0x${string}` => {
+  if (!value) throw new Error('Empty address')
+  let addr = value
+  if (addr.startsWith('0x0x')) addr = '0x' + addr.slice(4) // remove duplicated 0x
+  // If 32-byte padded (0x + 24 zeros + 40-hex)
+  const noPrefix = addr.slice(2)
+  if (/^0{24}[0-9a-fA-F]{40}$/.test(noPrefix)) {
+    addr = '0x' + noPrefix.slice(-40)
+  }
+  if (!isAddress(addr)) throw new Error(`Invalid address: ${addr}`)
+  return getAddress(addr) as `0x${string}`
 }
 
 async function checkTokenApproval(
@@ -199,6 +226,11 @@ async function executeGaslessTrade(
   const tradeStruct = {
     ...estimate.eip712.message,
     signature: userSignature,
+    userAccount: normalizeAndChecksumAddress(estimate.eip712.message.userAccount),
+    destReceiver: normalizeAndChecksumAddress(estimate.eip712.message.destReceiver),
+    srcToken: normalizeAndChecksumAddress(estimate.eip712.message.srcToken),
+    destToken: normalizeAndChecksumAddress(estimate.eip712.message.destToken),
+    adapter: normalizeAndChecksumAddress(estimate.eip712.message.adapter),
   }
 
   const calldata = encodeFunctionData({
@@ -208,9 +240,9 @@ async function executeGaslessTrade(
   })
 
   const txHash = await relayerClient.sendTransaction({
-    to: estimate.txData.to,
+    to: normalizeAndChecksumAddress(estimate.txData.to),
     data: calldata,
-    value: 0n,
+    value: BigInt(estimate.txData.value ?? 0),
   })
   return txHash
 }
@@ -219,8 +251,15 @@ const executeTradeGasless = async () => {
   if (!USER_PRIVATE_KEY) throw new Error('PRIVATE_KEY not set')
   if (!RELAYER_PRIVATE_KEY) throw new Error('RELAYER_PRIVATE_KEY not set')
 
-  const userAccount = privateKeyToAccount(USER_PRIVATE_KEY as `0x${string}`)
-  const relayerAccount = privateKeyToAccount(RELAYER_PRIVATE_KEY as `0x${string}`)
+  // Validate private key format and normalize to 0x + 64 hex
+  const formatPrivateKey = (key: string): `0x${string}` => {
+    const k = key.startsWith('0x') ? key : `0x${key}`
+    if (k.length !== 66) throw new Error(`Invalid private key length: ${k.length}. Expected 66 including 0x`)
+    return k as `0x${string}`
+  }
+
+  const userAccount = privateKeyToAccount(formatPrivateKey(USER_PRIVATE_KEY))
+  const relayerAccount = privateKeyToAccount(formatPrivateKey(RELAYER_PRIVATE_KEY))
 
   const quoteRequest = {
     ...QUOTE_REQUEST,

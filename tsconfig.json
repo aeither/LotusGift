@@ -8,9 +8,10 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "types": ["node"],
-    "lib": ["ES2022", "DOM"]
+    "lib": ["ES2022", "DOM"],
+    "outDir": "dist"
   },
-  "include": ["scripts/**/*.ts"],
+  "include": ["backend/**/*.ts"],
   "exclude": ["node_modules"]
 }
 
