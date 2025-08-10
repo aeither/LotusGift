@@ -77,6 +77,42 @@ app.post('/api/greeting', async (c) => {
   }
 })
 
+// Gift message generator (POST)
+app.post('/api/gift-message', async (c) => {
+  try {
+    const body = await c.req.json<{
+      recipient?: string
+      amount?: string | number
+      currency?: string
+      category?: string
+      message?: string
+      sender?: string
+    }>()
+
+    const recipient = (body?.recipient || 'friend').trim()
+    const currency = (body?.currency || 'ETH').toUpperCase()
+    const amountStr = String(body?.amount ?? '')
+    const category = (body?.category || '').trim()
+    const custom = (body?.message || '').trim()
+    const sender = (body?.sender || '').trim()
+
+    const prettyAmount = amountStr ? `${amountStr} ${currency}` : `${currency}`
+    const subject = `🎁 LotusGift for ${recipient}`
+    const parts: string[] = []
+    parts.push(`You have received ${prettyAmount}`)
+    if (category) parts.push(`for ${category}`)
+    if (sender) parts.push(`from ${sender}`)
+    const header = parts.join(' ')
+
+    const bodyText = custom || 'Open the app to view your message and claim the gift.'
+    const text = `${header}. ${bodyText}`
+
+    return c.json({ subject, text, recipient, amount: amountStr, currency, category, sender, timestamp: new Date().toISOString() })
+  } catch (err) {
+    return c.json({ error: 'Invalid JSON body' }, 400)
+  }
+})
+
 export function buildManifest() {
   const baseUrl = getBaseUrl()
   return {
@@ -155,6 +191,67 @@ export function buildManifest() {
                     properties: {
                       error: { type: 'string' },
                     },
+                    required: ['error'],
+                  },
+                },
+              },
+            },
+          },
+        },
+      },
+      '/api/gift-message': {
+        post: {
+          operationId: 'giftMessage',
+          summary: 'Generate a human-friendly gift message',
+          description: 'Builds a short message the UI can show or send in a notification for a gift.',
+          requestBody: {
+            required: true,
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    recipient: { type: 'string' },
+                    amount: { oneOf: [{ type: 'string' }, { type: 'number' }] },
+                    currency: { type: 'string', default: 'ETH' },
+                    category: { type: 'string' },
+                    message: { type: 'string' },
+                    sender: { type: 'string' },
+                  },
+                  required: ['recipient'],
+                },
+              },
+            },
+          },
+          responses: {
+            '200': {
+              description: 'Gift message generated successfully',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: {
+                      subject: { type: 'string' },
+                      text: { type: 'string' },
+                      recipient: { type: 'string' },
+                      amount: { type: 'string' },
+                      currency: { type: 'string' },
+                      category: { type: 'string' },
+                      sender: { type: 'string' },
+                      timestamp: { type: 'string' },
+                    },
+                    required: ['subject', 'text', 'recipient', 'timestamp'],
+                  },
+                },
+              },
+            },
+            '400': {
+              description: 'Bad request',
+              content: {
+                'application/json': {
+                  schema: {
+                    type: 'object',
+                    properties: { error: { type: 'string' } },
                     required: ['error'],
                   },
                 },
