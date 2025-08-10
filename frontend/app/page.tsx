@@ -27,10 +27,9 @@ export default function HomePage() {
       </div>
       <header className="container py-4">
         <nav className="flex items-center justify-between">
-          <a href="#" className="font-semibold text-lg relative">Lì xì</a>
+          <a href="#" className="font-semibold text-lg relative">LotusGift</a>
           <div className="flex items-center gap-3">
-            <a href="#gift" className="text-sm relative">Tạo phong bao</a>
-            <ConnectButton />
+            <a href="#gift" className="text-sm relative">Create gift</a>
           </div>
         </nav>
       </header>

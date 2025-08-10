@@ -85,7 +85,7 @@ function GlobalHeader({
             gap: "0.5rem"
           }}
         >
-          🏛️ Tezoro
+          LotusGift
         </Link>
       </div>
 

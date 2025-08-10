@@ -1,0 +1,74 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Minimal Bitte Agent (Hono)",
+    "version": "0.1.0",
+    "description": "A minimal agent exposing a coinflip and greeting tool."
+  },
+  "servers": [{ "url": "http://localhost:3001" }],
+  "paths": {
+    "/api/coinflip": {
+      "get": {
+        "operationId": "coinflip",
+        "summary": "Flip a coin and return heads or tails",
+        "responses": {
+          "200": {
+            "description": "Successful coin flip",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "result": { "type": "string", "enum": ["heads", "tails"] },
+                    "message": { "type": "string" }
+                  },
+                  "required": ["result", "message"]
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/greeting": {
+      "post": {
+        "operationId": "greeting",
+        "summary": "Generate a personalized greeting",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": { "name": { "type": "string" } },
+                "required": ["name"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Greeting generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "greeting": { "type": "string" },
+                    "timestamp": { "type": "string" }
+                  },
+                  "required": ["greeting", "timestamp"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request"
+          }
+        }
+      }
+    }
+  }
+}
+
+

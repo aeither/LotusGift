@@ -10,7 +10,11 @@ const HOST = process.env.HOST || 'localhost'
 const BITTE_API_KEY = process.env.BITTE_API_KEY
 
 function getBaseUrl(): string {
-  // Check for deployment URL first (Vercel, Railway, Render, or explicit override)
+  // Explicit override for deployments
+  if (process.env.BITTE_AGENT_URL) {
+    return String(process.env.BITTE_AGENT_URL)
+  }
+  // Common platform environment URLs
   if (process.env.VERCEL_URL) {
     return `https://${process.env.VERCEL_URL}`
   }
@@ -20,12 +24,8 @@ function getBaseUrl(): string {
   if (process.env.RENDER_EXTERNAL_URL) {
     return String(process.env.RENDER_EXTERNAL_URL)
   }
-  if (process.env.BITTE_AGENT_URL) {
-    return String(process.env.BITTE_AGENT_URL)
-  }
-
-  const isLocal = HOST === 'localhost' || HOST === '127.0.0.1'
-  return `http://${isLocal ? 'localhost' : HOST}:${PORT}`
+  // Local fallback
+  return `http://localhost:${PORT}`
 }
 
 const app = new Hono()
@@ -77,7 +77,7 @@ app.post('/api/greeting', async (c) => {
   }
 })
 
-function buildManifest() {
+export function buildManifest() {
   const baseUrl = getBaseUrl()
   return {
     openapi: '3.0.3',
@@ -105,6 +105,7 @@ function buildManifest() {
                       result: { type: 'string', enum: ['heads', 'tails'] },
                       message: { type: 'string' },
                     },
+                    required: ['result', 'message'],
                   },
                 },
               },
@@ -140,6 +141,7 @@ function buildManifest() {
                       greeting: { type: 'string' },
                       timestamp: { type: 'string' },
                     },
+                    required: ['greeting', 'timestamp'],
                   },
                 },
               },
@@ -153,6 +155,7 @@ function buildManifest() {
                     properties: {
                       error: { type: 'string' },
                     },
+                    required: ['error'],
                   },
                 },
               },

@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useMiniKit, useOpenUrl, useNotification } from '@coinbase/onchainkit/minikit';
+import { Button } from '@/components/ui/Button'
 import { formatEther, parseEther } from 'viem';
 import { useAccount, useReadContract, useReadContracts, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
 import { giftVaultABI } from '../../src/libs/giftVaultABI';
@@ -121,8 +122,8 @@ export default function GiftPage() {
         <input className="border border-neutral-200 rounded-md p-2" placeholder="Amount (ETH)" value={amount} onChange={(e) => setAmount(e.target.value)} />
         <input className="border border-neutral-200 rounded-md p-2" placeholder="Message" value={message} onChange={(e) => setMessage(e.target.value)} />
         <input className="border border-neutral-200 rounded-md p-2" placeholder="Category (birthday)" value={category} onChange={(e) => setCategory(e.target.value)} />
-        <button className="bg-neutral-900 text-white rounded-md py-2" onClick={createGift} disabled={isConfirming}>Send Gift</button>
-        <button className="bg-white text-neutral-900 border border-neutral-200 rounded-md py-2" onClick={() => openUrl('https://base.org/builders/minikit')}>Learn MiniKit</button>
+        <Button className="bg-neutral-900 text-white cursor-pointer" onClick={createGift} disabled={isConfirming}>Send Gift</Button>
+        <Button variant="outline" className="cursor-pointer" onClick={() => openUrl('https://base.org/builders/minikit')}>Learn MiniKit</Button>
       </div>
 
       <hr className="my-6 border-neutral-200" />
@@ -149,7 +150,7 @@ export default function GiftPage() {
               <div className="flex-1 text-sm">
                 #{String(id)} from {sender.slice(0, 6)}… → {formatEther(amountWei)} ETH — {messageStr} [{categoryStr}] {hasClaimed ? '✅' : ''}
               </div>
-              {!hasClaimed && <button className="bg-neutral-900 text-white rounded-md px-3 py-1" onClick={() => claimGift(id)}>Claim</button>}
+              {!hasClaimed && <Button className="cursor-pointer" onClick={() => claimGift(id)}>Claim</Button>}
             </div>
           );
         })}
@@ -158,7 +159,7 @@ export default function GiftPage() {
       <hr className="my-6 border-neutral-200" />
       <h3 className="font-medium mb-2">Admin</h3>
       <div className="flex gap-2">
-        <button className="bg-red-600 text-white rounded-md px-3 py-2" onClick={withdrawAll}>Withdraw All</button>
+        <Button className="bg-red-600 text-white cursor-pointer" onClick={withdrawAll}>Withdraw All</Button>
       </div>
     </main>
   );

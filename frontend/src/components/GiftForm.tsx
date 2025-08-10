@@ -2,10 +2,12 @@
 
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { useAccount } from 'wagmi'
+import { Button } from '@/components/ui/Button'
+import { useAccount, useWalletClient } from 'wagmi'
 import { base, optimism } from 'wagmi/chains'
 import { zircuit as zircuitChain } from 'viem/chains'
 import { QUOTE_REQUEST as TEMPLATE } from '@/libs/bridgeTemplate'
+import { parseUnits } from 'viem'
 
 type ChainOption = { id: number; name: string }
 
@@ -17,6 +19,7 @@ const CHAINS: ChainOption[] = [
 
 export default function GiftForm() {
   const { address } = useAccount()
+  const { data: walletClient } = useWalletClient()
   const [destChainId, setDestChainId] = useState<number>(zircuitChain.id)
   const [receiver, setReceiver] = useState<string>('')
   const [amountUsdc, setAmountUsdc] = useState<string>('1')
@@ -24,13 +27,28 @@ export default function GiftForm() {
   const startSwap = async () => {
     if (!address) return toast.error('Connect wallet first')
     if (!receiver) return toast.error('Enter receiver address')
-    const srcAmountWei = String(Math.round(Number(amountUsdc) * 1_000_000))
+    // Parse tolerant input like "1 usdc" or "1,00"
+    const numeric = amountUsdc.replace(/[^0-9.,]/g, '').replace(',', '.')
+    if (!numeric || Number.isNaN(Number(numeric))) {
+      return toast.error('Enter a valid USDC amount')
+    }
+    let srcAmountWei: string
+    try {
+      srcAmountWei = parseUnits(numeric, 6).toString()
+    } catch {
+      return toast.error('Invalid USDC amount')
+    }
 
     const req = {
       ...TEMPLATE,
       srcAmountWei,
       destChainId,
     }
+
+    // Log how QUOTE_REQUEST looks after user input
+    console.log('QUOTE_REQUEST →', req)
+    console.log('receiver →', receiver)
+    console.log('wallet connected →', Boolean(walletClient), 'address →', address)
 
     const p = fetch('/api/bridge', {
       method: 'POST',
@@ -56,7 +74,7 @@ export default function GiftForm() {
       </div>
       <div className="grid gap-2">
         <label className="text-sm">Amount (USDC)</label>
-        <input className="border border-neutral-200 rounded-md p-2" placeholder="1.00" value={amountUsdc} onChange={(e) => setAmountUsdc(e.target.value)} />
+        <input className="border border-neutral-200 rounded-md p-2" inputMode="decimal" placeholder="1.00" value={amountUsdc} onChange={(e) => setAmountUsdc(e.target.value)} />
       </div>
       <div className="grid gap-2">
         <label className="text-sm">Destination chain</label>
@@ -68,9 +86,9 @@ export default function GiftForm() {
           ))}
         </select>
       </div>
-      <button className="bg-red-600 text-white rounded-md py-2" onClick={startSwap}>
+      <Button className="bg-red-600 text-white cursor-pointer" onClick={startSwap}>
         Swap & Send
-      </button>
+      </Button>
     </div>
   )
 }

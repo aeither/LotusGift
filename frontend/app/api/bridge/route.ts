@@ -11,5 +11,3 @@ export async function POST(req: NextRequest) {
     return new Response(e?.message || 'Bad request', { status: 400 })
   }
 }
-
-
