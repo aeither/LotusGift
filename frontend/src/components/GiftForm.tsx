@@ -3,11 +3,12 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/Button'
-import { useAccount, useWalletClient } from 'wagmi'
+import { useAccount, useWalletClient, usePublicClient, useChainId, useSwitchChain, useSendTransaction, useWriteContract } from 'wagmi'
+import { erc20Abi } from 'viem'
 import { base, optimism } from 'wagmi/chains'
 import { zircuit as zircuitChain } from 'viem/chains'
 import { QUOTE_REQUEST as TEMPLATE } from '@/libs/bridgeTemplate'
-import { parseUnits } from 'viem'
+import { sanitizeUsdcInput, estimateOrder, getOrderStatus } from '@/libs/tradeClient'
 
 type ChainOption = { id: number; name: string }
 
@@ -20,6 +21,11 @@ const CHAINS: ChainOption[] = [
 export default function GiftForm() {
   const { address } = useAccount()
   const { data: walletClient } = useWalletClient()
+  const currentChainId = useChainId()
+  const publicClient = usePublicClient()
+  const { switchChainAsync } = useSwitchChain()
+  const { sendTransactionAsync } = useSendTransaction()
+  const { writeContractAsync } = useWriteContract()
   const [destChainId, setDestChainId] = useState<number>(zircuitChain.id)
   const [receiver, setReceiver] = useState<string>('')
   const [amountUsdc, setAmountUsdc] = useState<string>('1')
@@ -34,7 +40,7 @@ export default function GiftForm() {
     }
     let srcAmountWei: string
     try {
-      srcAmountWei = parseUnits(numeric, 6).toString()
+      srcAmountWei = sanitizeUsdcInput(numeric)
     } catch {
       return toast.error('Invalid USDC amount')
     }
@@ -43,27 +49,76 @@ export default function GiftForm() {
       ...TEMPLATE,
       srcAmountWei,
       destChainId,
-    }
+    } as const
 
     // Log how QUOTE_REQUEST looks after user input
     console.log('QUOTE_REQUEST →', req)
     console.log('receiver →', receiver)
     console.log('wallet connected →', Boolean(walletClient), 'address →', address)
 
-    const p = fetch('/api/bridge', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ request: req, receiver }),
-    }).then(async (r) => {
-      if (!r.ok) throw new Error(await r.text())
-      return r.json()
+    const estimate = await toast.promise(estimateOrder(req), {
+      loading: 'Requesting quote…',
+      success: 'Quote received',
+      error: 'Failed to get quote',
     })
 
-    toast.promise(p, {
-      loading: 'Submitting trade…',
-      success: 'Trade submitted. Tracking…',
-      error: 'Failed to submit trade',
-    })
+    const data = (estimate as any).data || estimate
+    const tx = data.tx
+    const trade = data.trade
+    if (!tx?.to || !tx?.data) throw new Error('Invalid quote tx payload')
+
+    // Ensure correct chain
+    if (currentChainId !== req.srcChainId) {
+      await switchChainAsync({ chainId: req.srcChainId })
+    }
+
+    // Check allowance for USDC (if non-native)
+    const spender = tx.to as `0x${string}`
+    const token = req.srcToken as `0x${string}`
+    if (token.toLowerCase() !== '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
+      const allowance = await publicClient!.readContract({
+        address: token,
+        abi: erc20Abi,
+        functionName: 'allowance',
+        args: [address as `0x${string}`, spender],
+      })
+      if ((allowance as bigint) < BigInt(req.srcAmountWei)) {
+        const { request } = await publicClient!.simulateContract({
+          address: token,
+          abi: erc20Abi,
+          functionName: 'approve',
+          args: [spender, BigInt(req.srcAmountWei)],
+          account: address as `0x${string}`,
+        })
+        const approveHash = await toast.promise(
+          writeContractAsync(request as any),
+          { loading: 'Approving USDC…', success: 'Approved', error: 'Approval failed' },
+        )
+        await publicClient!.waitForTransactionReceipt({ hash: approveHash as `0x${string}` })
+      }
+    }
+
+    // Send trade tx
+    const tradeHash = await toast.promise(
+      sendTransactionAsync({
+        to: tx.to as `0x${string}`,
+        data: tx.data as `0x${string}`,
+        value: tx.value ? BigInt(tx.value) : 0n,
+        chainId: req.srcChainId,
+      }),
+      { loading: 'Submitting trade…', success: 'Trade submitted', error: 'Trade submission failed' },
+    )
+    await publicClient!.waitForTransactionReceipt({ hash: tradeHash as `0x${string}` })
+
+    // Poll order status (basic)
+    let status = 'PENDING'
+    for (let i = 0; i < 20; i++) {
+      const s = await getOrderStatus(tradeHash as string)
+      status = (s.status || s?.data?.status || '').toString()
+      if (['SUCCESS', 'FAILED', 'REFUNDED', 'UNKNOWN'].includes(status)) break
+      await new Promise((r) => setTimeout(r, 2000))
+    }
+    toast.success(`Trade status: ${status || 'UNKNOWN'}`)
   }
 
   return (
