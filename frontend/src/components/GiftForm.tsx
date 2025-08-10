@@ -59,11 +59,13 @@ export default function GiftForm() {
     console.log('receiver →', receiver)
     console.log('wallet connected →', Boolean(walletClient), 'address →', address)
 
-    const estimate = await toast.promise(estimateOrder(req), {
-      loading: 'Requesting quote…',
-      success: 'Quote received',
-      error: 'Failed to get quote',
-    })
+    const estimate = await estimateOrder(req)
+    console.log('estimate →', estimate)
+    // const estimate = await toast.promise(estimateOrder(req), {
+    //   loading: 'Requesting quote…',
+    //   success: 'Quote received',
+    //   error: 'Failed to get quote',
+    // })
 
     const data = (estimate as any).data || estimate
     const trade = (data as any)?.trade
