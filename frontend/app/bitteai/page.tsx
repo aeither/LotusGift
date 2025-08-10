@@ -27,7 +27,12 @@ export default function BitteAIPage() {
         {!agentId && (
           <div className="text-sm text-red-600">Set NEXT_PUBLIC_BITTE_AGENT_ID in .env.local</div>
         )}
-        <BitteAiChat agentId={agentId} apiUrl="/api/bitte/chat" format="markdown" wallet={{ evm: { sendTransaction: sendTx as any, address } }} />
+        <BitteAiChat agentId={agentId} apiUrl="/api/bitte/chat" format="markdown" wallet={{
+          evm: {
+            sendTransaction: sendTx as any, address,
+            switchChain: undefined as any,
+          }
+        }} />
       </main>
     </ClientOnly>
   )

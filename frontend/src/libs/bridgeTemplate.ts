@@ -1,6 +1,8 @@
+import type { QuoteRequest } from './tradeClient'
+
 // Default quote request template used by the frontend bridge flow
 // Mirrors the structure expected by the trading engine
-export const QUOTE_REQUEST = {
+export const QUOTE_REQUEST: QuoteRequest = {
   // Base mainnet
   srcChainId: 8453,
   // USDC on Base
@@ -14,7 +16,5 @@ export const QUOTE_REQUEST = {
   // 1% slippage in basis points
   slippageBps: 100,
 }
-
-export type QuoteRequest = typeof QUOTE_REQUEST
 
 

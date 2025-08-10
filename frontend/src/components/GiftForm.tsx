@@ -45,11 +45,11 @@ export default function GiftForm() {
       return toast.error('Invalid USDC amount')
     }
 
-    const req = {
+    const req: Parameters<typeof estimateOrder>[0] = {
       ...TEMPLATE,
       srcAmountWei,
       destChainId,
-    } as const
+    }
 
     // Log how QUOTE_REQUEST looks after user input
     console.log('QUOTE_REQUEST →', req)
