@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
-import { useMiniKit, useOpenUrl, useNotification } from '@coinbase/onchainkit/minikit';
+import { useMiniKit, useOpenUrl, useNotification, useAddFrame, useComposeCast, usePrimaryButton } from '@coinbase/onchainkit/minikit';
 import { Button } from '@/components/ui/Button'
 import { formatEther, parseEther } from 'viem';
 import { useAccount, useReadContract, useReadContracts, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
@@ -10,6 +10,8 @@ import { coreTestnet } from '../../src/libs/coreChain';
 
 export default function GiftPage() {
   const { setFrameReady, isFrameReady } = useMiniKit();
+  const addFrame = useAddFrame();
+  const { composeCast } = useComposeCast();
   const notify = useNotification();
   const openUrl = useOpenUrl();
   const [receiver, setReceiver] = useState('');
@@ -33,6 +35,14 @@ export default function GiftPage() {
 
   if (!isFrameReady) setFrameReady();
 
+  // Set a MiniKit primary button to trigger send action when embedded
+  usePrimaryButton(
+    { text: 'Send Gift' },
+    () => {
+      if (!isConfirming) createGift();
+    },
+  )
+
   const createGift = async () => {
     if (!contractAddress) return alert('Set NEXT_PUBLIC_GIFT_VAULT_ADDRESS');
     try {
@@ -46,6 +56,10 @@ export default function GiftPage() {
       });
       setWriteHash(hash);
       await notify({ title: '🎁 Gift created', body: `To: ${receiver} | ${message}` });
+      // Offer quick share on Farcaster
+      try {
+        composeCast({ text: `I just sent a LotusGift to ${receiver}! 🎁 ${amount} ETH — ${message}` });
+      } catch {}
     } catch (e: any) {
       alert(e?.shortMessage || e?.message || String(e));
     }
@@ -123,7 +137,10 @@ export default function GiftPage() {
         <input className="border border-neutral-200 rounded-md p-2" placeholder="Message" value={message} onChange={(e) => setMessage(e.target.value)} />
         <input className="border border-neutral-200 rounded-md p-2" placeholder="Category (birthday)" value={category} onChange={(e) => setCategory(e.target.value)} />
         <Button className="bg-neutral-900 text-white cursor-pointer" onClick={createGift} disabled={isConfirming}>Send Gift</Button>
-        <Button variant="outline" className="cursor-pointer" onClick={() => openUrl('https://base.org/builders/minikit')}>Learn MiniKit</Button>
+        <div className="flex gap-2">
+          <Button variant="outline" className="cursor-pointer" onClick={() => addFrame().catch(() => {})}>Add to MiniKit</Button>
+          <Button variant="outline" className="cursor-pointer" onClick={() => openUrl('https://base.org/builders/minikit')}>Learn MiniKit</Button>
+        </div>
       </div>
 
       <hr className="my-6 border-neutral-200" />

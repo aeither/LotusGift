@@ -16,6 +16,25 @@ export default function HomePage() {
   const sendNotification = useNotification();
   const viewProfile = useViewProfile();
 
+  const handleAddFrame = async () => {
+    try {
+      const result = await addFrame();
+      if (result?.url) {
+        console.log('Mini App added:', result.url);
+      }
+    } catch (e) {
+      console.error('AddFrame failed', e);
+    }
+  };
+
+  const handleViewProfile = () => {
+    try {
+      viewProfile();
+    } catch (e) {
+      console.error('ViewProfile failed', e);
+    }
+  };
+
   useEffect(() => {
     if (!isFrameReady) setFrameReady();
   }, [isFrameReady, setFrameReady]);
@@ -30,6 +49,8 @@ export default function HomePage() {
           <a href="#" className="font-semibold text-lg relative">LotusGift</a>
           <div className="flex items-center gap-3">
             <a href="#gift" className="text-sm relative">Create gift</a>
+            <button onClick={handleAddFrame} className="text-sm relative underline-offset-2 hover:underline">Add to MiniKit</button>
+            <button onClick={handleViewProfile} className="text-sm relative underline-offset-2 hover:underline">My Profile</button>
           </div>
         </nav>
       </header>
