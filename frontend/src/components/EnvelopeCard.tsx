@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { Card, CardContent } from '@/components/ui/card'
-import { cn } from '@/src/lib/utils'
+import { cn } from '@/lib/utils'
 
 export type EnvelopeProps = {
   recipient?: string

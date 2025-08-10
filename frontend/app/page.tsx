@@ -6,6 +6,7 @@ import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Hero from '@/components/Hero';
 import EnvelopeCard from '@/components/EnvelopeCard';
 import CatRain from '@/components/CatRain';
+import GiftForm from '@/components/GiftForm';
 
 export default function HomePage() {
   const { setFrameReady, isFrameReady, context } = useMiniKit();
@@ -21,7 +22,9 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      <CatRain />
+      <div className="fixed bottom-2 right-2 opacity-80 scale-90 md:scale-100">
+        <CatRain />
+      </div>
       <header className="container py-4">
         <nav className="flex items-center justify-between">
           <a href="#" className="font-semibold text-lg relative">Lì xì</a>
@@ -39,9 +42,9 @@ export default function HomePage() {
           <h1 id="gift-title" className="sr-only">Lì xì – Mobile Gifting App</h1>
           <div className="grid gap-6 md:grid-cols-2">
             <EnvelopeCard />
-            <div className="grid gap-3 content-start">
-              <Link href="/gift" className="bg-red-600 text-white rounded-md py-3 text-center">Bắt đầu tặng lì xì</Link>
-              <button className="bg-white border border-neutral-200 rounded-md py-3" onClick={() => openUrl('https://base.org/builders/minikit')}>Built with MiniKit</button>
+            <div className="grid gap-4 content-start">
+              <GiftForm />
+              <Link href="/gift" className="bg-white border border-neutral-200 rounded-md py-3 text-center">View/Claim Gifts</Link>
             </div>
           </div>
         </section>
