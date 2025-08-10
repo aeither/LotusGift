@@ -21,19 +21,12 @@ export function getPublicClientById(chainId: number) {
   return createPublicClient({ chain, transport: http() })
 }
 
-// Direct Engine config (client-side) – for demo only. Do not ship hardcoded keys to production.
-const ENGINE_API_BASE = process.env.NEXT_PUBLIC_ZIRCUIT_ENGINE_API_BASE || 'https://trading.ai.zircuit.com/api/engine/v1'
-const ENGINE_API_KEY = 'ETHVietnam2025'
-
 export async function estimateOrder(req: QuoteRequest) {
   console.log('tradeClient.estimateOrder →', req)
-  const res = await fetch(`${ENGINE_API_BASE}/order/estimate`, {
+  const res = await fetch('/api/bridge', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    // Demo: Authorization sent from client. Replace with server-side proxy for production.
-    // eslint-disable-next-line @typescript-eslint/naming-convention
-    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${ENGINE_API_KEY}` },
-    body: JSON.stringify(req),
+    body: JSON.stringify({ path: 'order/estimate', payload: req }),
   })
   if (!res.ok) {
     const err = await res.text()
@@ -45,11 +38,10 @@ export async function estimateOrder(req: QuoteRequest) {
 
 export async function getOrderStatus(txHash: string) {
   console.log('tradeClient.getOrderStatus →', txHash)
-  const p = new URLSearchParams({ txHash })
-  const res = await fetch(`${ENGINE_API_BASE}/order/status?${p.toString()}`, {
-    method: 'GET',
-    // Demo header – move server-side for production.
-    headers: { Authorization: `Bearer ${ENGINE_API_KEY}` },
+  const res = await fetch('/api/bridge', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ path: 'order/status', txHash }),
   })
   if (!res.ok) {
     const err = await res.text()
