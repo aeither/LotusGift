@@ -108,26 +108,26 @@ export default function GiftPage() {
   });
 
   return (
-    <main style={{ padding: 16, maxWidth: 520, margin: '0 auto' }}>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+    <main className="max-w-xl mx-auto p-6">
+      <div className="flex items-center justify-between mb-4">
+        <h1 className="text-2xl font-semibold">LotusGift</h1>
         <ConnectButton />
       </div>
-      <h1>LotusGift</h1>
-      <p style={{ opacity: 0.8 }}>Send a message-attached micro-gift</p>
-      <div style={{ fontSize: 12, opacity: 0.7 }}>Contract: {contractAddress || '(set NEXT_PUBLIC_GIFT_VAULT_ADDRESS)'}</div>
+      <p className="text-neutral-600">Send a message-attached micro-gift</p>
+      <div className="text-xs text-neutral-500">Contract: {contractAddress || '(set NEXT_PUBLIC_GIFT_VAULT_ADDRESS)'}</div>
 
-      <div style={{ display: 'grid', gap: 12, marginTop: 16 }}>
-        <input placeholder="Receiver (0x...)" value={receiver} onChange={(e) => setReceiver(e.target.value)} />
-        <input placeholder="Amount (ETH)" value={amount} onChange={(e) => setAmount(e.target.value)} />
-        <input placeholder="Message" value={message} onChange={(e) => setMessage(e.target.value)} />
-        <input placeholder="Category (birthday)" value={category} onChange={(e) => setCategory(e.target.value)} />
-        <button onClick={createGift} disabled={isConfirming}>Send Gift</button>
-        <button onClick={() => openUrl('https://base.org/builders/minikit')}>Learn MiniKit</button>
+      <div className="grid gap-3 mt-4">
+        <input className="border border-neutral-200 rounded-md p-2" placeholder="Receiver (0x...)" value={receiver} onChange={(e) => setReceiver(e.target.value)} />
+        <input className="border border-neutral-200 rounded-md p-2" placeholder="Amount (ETH)" value={amount} onChange={(e) => setAmount(e.target.value)} />
+        <input className="border border-neutral-200 rounded-md p-2" placeholder="Message" value={message} onChange={(e) => setMessage(e.target.value)} />
+        <input className="border border-neutral-200 rounded-md p-2" placeholder="Category (birthday)" value={category} onChange={(e) => setCategory(e.target.value)} />
+        <button className="bg-neutral-900 text-white rounded-md py-2" onClick={createGift} disabled={isConfirming}>Send Gift</button>
+        <button className="bg-white text-neutral-900 border border-neutral-200 rounded-md py-2" onClick={() => openUrl('https://base.org/builders/minikit')}>Learn MiniKit</button>
       </div>
 
-      <hr style={{ margin: '24px 0', opacity: 0.2 }} />
-      <h3>My Incoming Gifts</h3>
-      <div style={{ display: 'grid', gap: 8 }}>
+      <hr className="my-6 border-neutral-200" />
+      <h3 className="font-medium mb-2">My Incoming Gifts</h3>
+      <div className="grid gap-2">
         {giftIds.map((id, idx) => {
           const res = giftsData?.[idx];
           const data = (res as any)?.result as
@@ -145,20 +145,20 @@ export default function GiftPage() {
           const [sender, receiverAddr, amountWei, messageStr, categoryStr, hasClaimed] = data;
           if (userAddress?.toLowerCase() !== receiverAddr.toLowerCase()) return null;
           return (
-            <div key={String(id)} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-              <div style={{ flex: 1, fontSize: 13 }}>
+            <div key={String(id)} className="flex items-center gap-2">
+              <div className="flex-1 text-sm">
                 #{String(id)} from {sender.slice(0, 6)}… → {formatEther(amountWei)} ETH — {messageStr} [{categoryStr}] {hasClaimed ? '✅' : ''}
               </div>
-              {!hasClaimed && <button onClick={() => claimGift(id)}>Claim</button>}
+              {!hasClaimed && <button className="bg-neutral-900 text-white rounded-md px-3 py-1" onClick={() => claimGift(id)}>Claim</button>}
             </div>
           );
         })}
       </div>
 
-      <hr style={{ margin: '24px 0', opacity: 0.2 }} />
-      <h3>Admin</h3>
-      <div style={{ display: 'flex', gap: 8 }}>
-        <button onClick={withdrawAll}>Withdraw All</button>
+      <hr className="my-6 border-neutral-200" />
+      <h3 className="font-medium mb-2">Admin</h3>
+      <div className="flex gap-2">
+        <button className="bg-red-600 text-white rounded-md px-3 py-2" onClick={withdrawAll}>Withdraw All</button>
       </div>
     </main>
   );
