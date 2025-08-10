@@ -119,6 +119,7 @@ export default function MiniKitDemoPage() {
         border: '1px solid #e5e7eb',
         borderRadius: 6,
         background: '#f9fafb',
+        color: '#111827',
         cursor: 'pointer',
       }}
     />

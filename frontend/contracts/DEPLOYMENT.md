@@ -1,57 +1,50 @@
 
 ## 🚀 Deployment Commands
 
-### Core Testnet2 - Chain ID: 1114
+All commands must be run from `frontend/contracts`. Ensure `forge` is installed and you have a funded `PRIVATE_KEY` set in `.env`.
+
 ```bash
-source .env && rm -rf cache out && forge build && forge script --chain 1114 script/QuizGame.s.sol:QuizGameScript --rpc-url https://rpc.test2.btcs.network --broadcast -vvvv --private-key ${PRIVATE_KEY}
+# one-time
+cp .env.example .env  # or create .env with PRIVATE_KEY=0x...
+source .env
+rm -rf cache out && forge build
 ```
 
-## 🌐 Core Testnet2 Network Details
+### Zircuit Mainnet - Chain ID: 48900 (0xbf04)
+```bash
+source .env && rm -rf cache out && forge build && forge script script/DeployGiftVault.s.sol:DeployGiftVault \
+  --chain 48900 \
+  --rpc-url https://mainnet.zircuit.com \
+  --broadcast -vvvv \
+  --private-key ${PRIVATE_KEY}
+```
 
+After deployment, copy the printed `GiftVault` address and update the frontend env file:
+
+```bash
+# from repository root
+echo "NEXT_PUBLIC_GIFT_VAULT_ADDRESS=0x..." >> frontend/.env.local
+```
+
+## 🌐 Network Details
+
+### Zircuit Mainnet
 | Parameter | Value |
 |-----------|-------|
-| **Network Name** | Core Testnet2 |
-| **Chain ID** | 1114 (0x45a) |
-| **RPC Endpoint** | https://rpc.test2.btcs.network |
-| **Archive Node RPC** | https://rpcar.test2.btcs.network |
-| **WebSocket Endpoint** | wss://rpc.test2.btcs.network/wsp |
-| **Currency Symbol** | tCORE |
-| **Block Explorer URL** | https://scan.test2.btcs.network/ |
-| **Faucet** | Available through Core DAO testnet faucet |
+| **Network Name** | Zircuit Mainnet |
+| **Chain ID** | 48900 (0xbf04) |
+| **RPC Endpoint** | https://mainnet.zircuit.com |
+| **Currency Symbol** | ETH |
 
-**Note**: This is the latest and officially supported testnet for the Core blockchain. The previous testnet (chain ID 1115) is now deprecated and no longer maintained.
+> RPC reference: [Zircuit Mainnet RPC](https://mainnet.zircuit.com)
 
 ## 📋 Contract Verification
 
-### Core Testnet2 Verification
-
-After deployment, verify your contracts on the Core Testnet2 block explorer:
-
-```bash
-# Verify QuizGame contract on Core Testnet2
-forge verify-contract \
---chain-id 1114 \
---rpc-url https://rpc.test2.btcs.network \
---verifier-url 'https://scan.test2.btcs.network/api/' \
---verifier blockscout \
-<CONTRACT_ADDRESS> \
-src/QuizGame.sol:QuizGame
-
-# Verify Token1 contract on Core Testnet2
-forge verify-contract \
---chain-id 1114 \
---rpc-url https://rpc.test2.btcs.network \
---verifier-url 'https://scan.test2.btcs.network/api/' \
---verifier blockscout \
-<TOKEN_CONTRACT_ADDRESS> \
-src/QuizGame.sol:Token1
-```
+Use the Zircuit explorer verification UI/API if available. Provide:
+- Compiler: solc 0.8.30
+- Optimizer: enabled, 200 runs, viaIR true
+- Contract: `src/GiftVault.sol:GiftVault`
 
 ## 🔗 Useful Resources
 
-### Core Blockchain Resources
-- **Core DAO Documentation**: https://docs.coredao.org/
-- **Core Testnet2 Block Explorer**: https://scan.test2.btcs.network/
-- **Core DAO Testnet Faucet**: https://scan.test2.btcs.network/faucet
-- **Core DAO Official Website**: https://coredao.org/
-- **Core DAO GitHub**: https://github.com/coredao-org
+- **Zircuit Mainnet RPC**: https://mainnet.zircuit.com

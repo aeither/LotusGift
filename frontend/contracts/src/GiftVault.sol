@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 contract GiftVault {
+    address public owner;
     struct Gift {
         address sender;
         address receiver;
@@ -17,6 +18,16 @@ contract GiftVault {
 
     event GiftCreated(uint256 indexed giftId, address indexed sender, address indexed receiver, uint256 amount, string message, string category);
     event GiftClaimed(uint256 indexed giftId, address indexed receiver, uint256 amount);
+    event Withdrawn(address indexed to, uint256 amount);
+
+    modifier onlyOwner() {
+        require(msg.sender == owner, "not owner");
+        _;
+    }
+
+    constructor() {
+        owner = msg.sender;
+    }
 
     function createGift(address receiver, string calldata message, string calldata category) external payable returns (uint256 giftId) {
         require(receiver != address(0), "invalid receiver");
@@ -47,6 +58,15 @@ contract GiftVault {
         (bool ok, ) = msg.sender.call{value: amount}("");
         require(ok, "transfer failed");
         emit GiftClaimed(giftId, msg.sender, amount);
+    }
+
+    function withdraw(address payable to) external onlyOwner {
+        require(to != address(0), "invalid to");
+        uint256 amount = address(this).balance;
+        require(amount > 0, "no funds");
+        (bool ok, ) = to.call{value: amount}("");
+        require(ok, "withdraw failed");
+        emit Withdrawn(to, amount);
     }
 }
 
