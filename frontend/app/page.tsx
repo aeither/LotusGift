@@ -1,6 +1,11 @@
 'use client';
 import { useEffect } from 'react';
 import { useMiniKit, useAddFrame, useOpenUrl, useClose, useNotification, useViewProfile } from '@coinbase/onchainkit/minikit';
+import Link from 'next/link';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
+import Hero from '@/components/Hero';
+import EnvelopeCard from '@/components/EnvelopeCard';
+import CatRain from '@/components/CatRain';
 
 export default function HomePage() {
   const { setFrameReady, isFrameReady, context } = useMiniKit();
@@ -15,33 +20,35 @@ export default function HomePage() {
   }, [isFrameReady, setFrameReady]);
 
   return (
-    <main style={{ padding: 16 }}>
-      <header style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <strong>{process.env.NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME || 'MiniKit App'}</strong>
-        <div>
-          <button onClick={async () => console.log('Frame added:', await addFrame())}>Save</button>
-          <button onClick={close} style={{ marginLeft: 8 }}>Close</button>
-          <button onClick={() => viewProfile()} style={{ marginLeft: 8 }}>Profile</button>
-        </div>
+    <div className="min-h-screen bg-background relative overflow-hidden">
+      <CatRain />
+      <header className="container py-4">
+        <nav className="flex items-center justify-between">
+          <a href="#" className="font-semibold text-lg relative">Lì xì</a>
+          <div className="flex items-center gap-3">
+            <a href="#gift" className="text-sm relative">Tạo phong bao</a>
+            <ConnectButton />
+          </div>
+        </nav>
       </header>
 
-      <section style={{ marginTop: 24 }}>
-        <p>Launch context: {String(context?.location ?? 'standalone')}</p>
-        <button onClick={() => openUrl('https://base.org/builders/minikit')}>Built with MiniKit</button>
-      </section>
+      <main id="content">
+        <Hero onStart={() => document.getElementById('gift')?.scrollIntoView({ behavior: 'smooth' })} />
 
-      {context?.client?.added && (
-        <section style={{ marginTop: 24 }}>
-          <button
-            onClick={() =>
-              sendNotification({ title: 'Test Notification', body: 'Hello from MiniKit!' })
-            }
-          >
-            Send Notification
-          </button>
+        <section id="gift" aria-labelledby="gift-title" className="animate-enter container pb-10">
+          <h1 id="gift-title" className="sr-only">Lì xì – Mobile Gifting App</h1>
+          <div className="grid gap-6 md:grid-cols-2">
+            <EnvelopeCard />
+            <div className="grid gap-3 content-start">
+              <Link href="/gift" className="bg-red-600 text-white rounded-md py-3 text-center">Bắt đầu tặng lì xì</Link>
+              <button className="bg-white border border-neutral-200 rounded-md py-3" onClick={() => openUrl('https://base.org/builders/minikit')}>Built with MiniKit</button>
+            </div>
+          </div>
         </section>
-      )}
-    </main>
+      </main>
+
+      <footer className="container py-10 text-center text-xs text-neutral-500">© {new Date().getFullYear()} Lì xì • Made with love</footer>
+    </div>
   );
 }
 
