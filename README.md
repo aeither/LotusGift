@@ -1,12 +1,12 @@
-# GiftVault: Smart Contract-Powered Gifting Platform
+# LotusGift: Smart Contract-Powered Gifting Platform
 
-GiftVault lets family and friends send message-attached micro-gifts that the intended recipient can later claim from a smart contract. Gifts are recorded on-chain with sender, receiver, amount, message, category, and timestamp.
+LotusGift lets family and friends send message-attached micro-gifts that the intended recipient can later claim from a smart contract. Gifts are recorded on-chain with sender, receiver, amount, message, category, and timestamp.
 
 This repository contains:
 - A minimal GiftVault smart contract (ETH-only gifts for now)
 - A Next.js mini frontend page to simulate sending gifts and test notifications
 - A minimal Hono backend exposing a manifest and sample tools (for Bitte-style agents)
-- Optional trading example scripts (separate from GiftVault)
+- Optional trading example scripts (separate from LotusGift)
 
 ## What’s implemented today
 
@@ -67,7 +67,7 @@ Create the following as needed:
 Frontend (`frontend/.env.local`):
 ```
 NEXT_PUBLIC_ONCHAINKIT_API_KEY=your_onchainkit_api_key
-NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME=GiftVault
+NEXT_PUBLIC_ONCHAINKIT_PROJECT_NAME=LotusGift
 NEXT_PUBLIC_ICON_URL=https://your-host/icon.png
 # Optional: override notification proxy target
 NEXT_PUBLIC_NOTIFICATION_PROXY_URL=https://api.developer.coinbase.com/cdp/notifications
@@ -113,7 +113,7 @@ forge test
 # See script/ for deployment helpers (e.g., DeployGiftVault.s.sol)
 ```
 
-Optional trading scripts (unrelated to GiftVault core):
+Optional trading scripts (unrelated to LotusGift core):
 ```
 # Direct execution example
 npx tsx scripts/trade.ts
@@ -122,7 +122,7 @@ npx tsx scripts/trade.ts
 npx tsx scripts/trade-gasless.ts
 ```
 
-## Interacting with GiftVault (example)
+## Interacting with LotusGift (example)
 
 Using viem to create and claim a gift (ETH-only):
 
@@ -162,7 +162,7 @@ await client.writeContract({
 - Gifts are ETH-only today. No private message encryption or ZK features are implemented.
 - The frontend “send gift” is currently a UI simulation; on-chain writes are not yet connected.
 - The Hono backend provides a minimal agent manifest and sample tools; it does not process gifts.
-- Trading scripts are examples unrelated to GiftVault’s core flow.
+- Trading scripts are examples unrelated to LotusGift’s core flow.
 
 ## License
 MIT

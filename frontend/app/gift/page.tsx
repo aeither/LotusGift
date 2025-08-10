@@ -21,7 +21,7 @@ export default function GiftPage() {
 
   return (
     <main style={{ padding: 16, maxWidth: 520, margin: '0 auto' }}>
-      <h1>GiftVault</h1>
+      <h1>LotusGift</h1>
       <p style={{ opacity: 0.8 }}>Send a message-attached micro-gift</p>
 
       <div style={{ display: 'grid', gap: 12, marginTop: 16 }}>
