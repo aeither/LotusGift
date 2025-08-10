@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "builds": [
+    { "src": "backend/server.ts", "use": "@vercel/node" }
+  ],
+  "routes": [
+    { "src": "/(health|api/ai-plugin|openapi.json|\\.well-known/ai-plugin.json)", "dest": "/backend/server.ts" },
+    { "src": "/api/(.*)", "dest": "/backend/server.ts" }
+  ]
+}
+
+

@@ -5,7 +5,7 @@
     "version": "0.1.0",
     "description": "A minimal agent exposing a coinflip and greeting tool."
   },
-  "servers": [{ "url": "http://localhost:3001" }],
+  "servers": [{ "url": "https://lotus-gift.vercel.app/" }],
   "paths": {
     "/api/coinflip": {
       "get": {
@@ -64,6 +64,66 @@
           },
           "400": {
             "description": "Bad request"
+          }
+        }
+      }
+    },
+    "/api/gift-message": {
+      "post": {
+        "operationId": "giftMessage",
+        "summary": "Generate a human-friendly gift message",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "recipient": { "type": "string" },
+                  "amount": { "oneOf": [{ "type": "string" }, { "type": "number" }] },
+                  "currency": { "type": "string", "default": "ETH" },
+                  "category": { "type": "string" },
+                  "message": { "type": "string" },
+                  "sender": { "type": "string" }
+                },
+                "required": ["recipient"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Gift message generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "subject": { "type": "string" },
+                    "text": { "type": "string" },
+                    "recipient": { "type": "string" },
+                    "amount": { "type": "string" },
+                    "currency": { "type": "string" },
+                    "category": { "type": "string" },
+                    "sender": { "type": "string" },
+                    "timestamp": { "type": "string" }
+                  },
+                  "required": ["subject", "text", "recipient", "timestamp"]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": { "error": { "type": "string" } },
+                  "required": ["error"]
+                }
+              }
+            }
           }
         }
       }

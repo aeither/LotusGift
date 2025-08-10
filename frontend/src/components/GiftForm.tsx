@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/Button'
 import { useAccount, useWalletClient, usePublicClient, useChainId, useSwitchChain, useSendTransaction, useWriteContract } from 'wagmi'
-import { erc20Abi } from 'viem'
+import { erc20Abi, getAddress, isAddress } from 'viem'
 import { base, optimism } from 'wagmi/chains'
 import { zircuit as zircuitChain } from 'viem/chains'
 import { QUOTE_REQUEST as TEMPLATE } from '@/libs/bridgeTemplate'
@@ -33,6 +33,7 @@ export default function GiftForm() {
   const startSwap = async () => {
     if (!address) return toast.error('Connect wallet first')
     if (!receiver) return toast.error('Enter receiver address')
+    if (!isAddress(receiver)) return toast.error('Receiver must be a valid EVM address')
     // Parse tolerant input like "1 usdc" or "1,00"
     const numeric = amountUsdc.replace(/[^0-9.,]/g, '').replace(',', '.')
     if (!numeric || Number.isNaN(Number(numeric))) {
@@ -49,6 +50,8 @@ export default function GiftForm() {
       ...TEMPLATE,
       srcAmountWei,
       destChainId,
+      userAccount: address as `0x${string}`,
+      destReceiver: getAddress(receiver) as `0x${string}`,
     }
 
     // Log how QUOTE_REQUEST looks after user input
@@ -63,9 +66,16 @@ export default function GiftForm() {
     })
 
     const data = (estimate as any).data || estimate
-    const tx = data.tx
-    const trade = data.trade
-    if (!tx?.to || !tx?.data) throw new Error('Invalid quote tx payload')
+    const trade = (data as any)?.trade
+    const tx = (data as any)?.tx
+    console.log('estimate.raw →', estimate)
+    console.log('estimate.data →', data)
+    console.log('Trade →', trade)
+    console.log('estimate.tx →', tx)
+    if (!tx?.to || !tx?.data) {
+      toast.error('Invalid quote tx payload. Check console for details.')
+      return
+    }
 
     // Ensure correct chain
     if (currentChainId !== req.srcChainId) {

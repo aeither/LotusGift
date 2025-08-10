@@ -282,10 +282,15 @@ export function buildManifest() {
   }
 }
 
-serve({ fetch: app.fetch, port: PORT }, () => {
-  console.log(`🚀 Hono backend running at ${getBaseUrl()}`)
-  console.log(`📋 Manifest: ${getBaseUrl()}/api/ai-plugin`)
-  console.log(`🔧 Health check: ${getBaseUrl()}/health`)
-})
+// For Vercel: export default app; only start a local server in non-production
+export default app
+
+if (process.env.NODE_ENV !== 'production') {
+  serve({ fetch: app.fetch, port: PORT }, () => {
+    console.log(`🚀 Hono backend running at ${getBaseUrl()}`)
+    console.log(`📋 Manifest: ${getBaseUrl()}/api/ai-plugin`)
+    console.log(`🔧 Health check: ${getBaseUrl()}/health`)
+  })
+}
 
 

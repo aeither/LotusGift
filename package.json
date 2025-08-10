@@ -5,8 +5,9 @@
   "private": true,
   "description": "ETHVietnam25 app with Bitte AI Hono backend and trading scripts",
   "scripts": {
-    "dev": "concurrently -k -n server,playground -c blue,magenta \"tsx watch backend/server.ts\" \"cross-env BITTE_AGENT_URL=http://localhost:3001 make-agent dev --port 3030\"",
+    "dev": "tsx watch backend/server.ts",
     "build": "tsc",
+    "vercel-build": "tsc",
     "start": "node dist/backend/server.js",
     "deploy": "make-agent deploy",
     "test": "echo \"No tests configured\""
