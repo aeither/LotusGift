@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@coinbase/onchainkit": "latest",
+    "@rainbow-me/rainbowkit": "^2.2.8",
     "@tanstack/react-query": "^5.51.9",
     "@xmtp/frames-validator": "^0.6.3",
     "graphql": "^16.9.0",

@@ -2,30 +2,28 @@ import { defineChain } from 'viem'
 
 // Core Testnet2 configuration
 export const coreTestnet = defineChain({
-  id: 1114,
-  name: 'Core Testnet',
+  id: 48900,
+  name: 'Zircuit Mainnet',
   nativeCurrency: {
     decimals: 18,
-    name: 'Core',
-    symbol: 'CORE',
+    name: 'Ether',
+    symbol: 'ETH',
   },
   rpcUrls: {
     default: {
-      http: ['https://rpc.test2.btcs.network'],
-      webSocket: ['wss://rpc.test2.btcs.network/wsp'],
+      http: ['https://mainnet.zircuit.com'],
     },
     public: {
-      http: ['https://rpc.test2.btcs.network'],
-      webSocket: ['wss://rpc.test2.btcs.network/wsp'],
+      http: ['https://mainnet.zircuit.com'],
     },
   },
   blockExplorers: {
     default: {
-      name: 'Core Testnet Explorer',
-      url: 'https://scan.test2.btcs.network',
+      name: 'Zircuit Explorer',
+      url: 'https://explorer.zircuit.com',
     },
   },
-  testnet: true,
+  testnet: false,
 })
 
 // Core Mainnet configuration for future use

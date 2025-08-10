@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useMemo, useState } from 'react';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useMiniKit, useOpenUrl, useNotification } from '@coinbase/onchainkit/minikit';
 import { formatEther, parseEther } from 'viem';
 import { useAccount, useReadContract, useReadContracts, useWriteContract, useWaitForTransactionReceipt } from 'wagmi';
@@ -108,6 +109,9 @@ export default function GiftPage() {
 
   return (
     <main style={{ padding: 16, maxWidth: 520, margin: '0 auto' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 12 }}>
+        <ConnectButton />
+      </div>
       <h1>LotusGift</h1>
       <p style={{ opacity: 0.8 }}>Send a message-attached micro-gift</p>
       <div style={{ fontSize: 12, opacity: 0.7 }}>Contract: {contractAddress || '(set NEXT_PUBLIC_GIFT_VAULT_ADDRESS)'}</div>
@@ -143,7 +147,7 @@ export default function GiftPage() {
           return (
             <div key={String(id)} style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
               <div style={{ flex: 1, fontSize: 13 }}>
-                #{String(id)} from {sender.slice(0, 6)}… → {formatEther(amountWei)} CORE — {messageStr} [{categoryStr}] {hasClaimed ? '✅' : ''}
+                #{String(id)} from {sender.slice(0, 6)}… → {formatEther(amountWei)} ETH — {messageStr} [{categoryStr}] {hasClaimed ? '✅' : ''}
               </div>
               {!hasClaimed && <button onClick={() => claimGift(id)}>Claim</button>}
             </div>

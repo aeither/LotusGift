@@ -1,6 +1,6 @@
 // Legacy header kept minimal for migration; router and wallet bindings removed
 const Link: any = (props: any) => <a href={props.to} {...props} />;
-const ConnectButton: any = () => null;
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount, useBalance } from 'wagmi';
 import { formatEther } from 'viem';
 import { getContractAddresses } from '../libs/constants';

@@ -22,9 +22,8 @@ export default function MiniKitDemoPage() {
   const closeApp = useClose()
   const { composeCast } = useComposeCast()
   const { viewCast } = useViewCast()
-  const viewMyProfile = useViewProfile()
+  const viewProfile = useViewProfile()
   const [fidToView, setFidToView] = useState('')
-  const viewUserProfile = useViewProfile(fidToView ? Number(fidToView) : undefined as any)
   const { signIn } = useAuthenticate()
 
   const [frameInfo, setFrameInfo] = useState<string>('')
@@ -92,9 +91,7 @@ export default function MiniKitDemoPage() {
 
   const handleAuth = async () => {
     try {
-      const domain = typeof window !== 'undefined' ? window.location.hostname : 'localhost'
-      const siweUri = typeof window !== 'undefined' ? `${window.location.origin}/login` : 'http://localhost:3000/login'
-      const res = await signIn({ domain, siweUri })
+      const res = await signIn()
       setAuthResult(res ? 'Authenticated ✅' : 'Cancelled / No result')
     } catch (e: any) {
       setAuthResult(`Auth error: ${e?.message || e}`)
@@ -198,19 +195,19 @@ export default function MiniKitDemoPage() {
         </Section>
 
         <Section title="Primary Button" description="Sets a primary button inside the Farcaster host UI for this Mini App.">
-          <span style={{ fontSize: 12, opacity: 0.8 }}>Configured: "Primary: Demo Action"</span>
+          <span style={{ fontSize: 12, opacity: 0.8 }}>Configured: &quot;Primary: Demo Action&quot;</span>
         </Section>
 
         <Section title="View Profile" description="Opens profiles using MiniKit (your own FID or a specific FID).">
           <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-            <Button onClick={viewMyProfile}>View My Profile</Button>
+            <Button onClick={() => viewProfile()}>View My Profile</Button>
             <input
               placeholder="FID"
               value={fidToView}
               onChange={(e) => setFidToView(e.target.value)}
               style={{ width: 160, padding: 8, border: '1px solid #e5e7eb', borderRadius: 6 }}
             />
-            <Button onClick={viewUserProfile}>View User Profile</Button>
+            <Button onClick={() => fidToView && viewProfile(Number(fidToView))}>View User Profile</Button>
           </div>
         </Section>
 

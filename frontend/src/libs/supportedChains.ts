@@ -10,14 +10,14 @@ export const SUPPORTED_CHAIN_IDS = SUPPORTED_CHAINS.map(chain => chain.id);
 
 // Currency configuration for different chains
 export const CURRENCY_CONFIG = {
-  1114: { // Core Testnet2
-    symbol: 'CORE',
+  48900: { // Zircuit Mainnet
+    symbol: 'ETH',
     multiplier: 1,
-    defaultAmounts: ['0.1', '0.5', '2.5']
+    defaultAmounts: ['0.01', '0.05', '0.1']
   },
   default: { // Fallback configuration
-    symbol: 'CORE',
+    symbol: 'ETH',
     multiplier: 1,
-    defaultAmounts: ['0.001', '0.005', '2.5']
+    defaultAmounts: ['0.001', '0.005', '0.05']
   }
 } as const; 
