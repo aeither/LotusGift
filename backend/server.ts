@@ -10,22 +10,7 @@ const HOST = process.env.HOST || 'localhost'
 const BITTE_API_KEY = process.env.BITTE_API_KEY
 
 function getBaseUrl(): string {
-  // Explicit override for deployments
-  if (process.env.BITTE_AGENT_URL) {
-    return String(process.env.BITTE_AGENT_URL)
-  }
-  // Common platform environment URLs
-  if (process.env.VERCEL_URL) {
-    return `https://${process.env.VERCEL_URL}`
-  }
-  if (process.env.RAILWAY_PUBLIC_DOMAIN) {
-    return `https://${process.env.RAILWAY_PUBLIC_DOMAIN}`
-  }
-  if (process.env.RENDER_EXTERNAL_URL) {
-    return String(process.env.RENDER_EXTERNAL_URL)
-  }
-  // Local fallback
-  return `http://localhost:${PORT}`
+  return `https://lotus-gift.vercel.app/`
 }
 
 const app = new Hono()

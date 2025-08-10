@@ -9,7 +9,7 @@
     "build": "tsc",
     "vercel-build": "tsc",
     "start": "node dist/backend/server.js",
-    "deploy": "make-agent deploy",
+    "deploy": "make-agent deploy -u https://lotus-gift.vercel.app",
     "test": "echo \"No tests configured\""
   },
   "repository": {
