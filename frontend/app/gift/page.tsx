@@ -30,7 +30,12 @@ export default function GiftPage() {
   });
 
   const [writeHash, setWriteHash] = useState<`0x${string}` | undefined>();
-  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: writeHash });
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash: writeHash,
+    chainId: coreTestnet.id,
+    // Only run when we actually have a tx hash
+    query: { enabled: Boolean(writeHash) },
+  });
   const { writeContractAsync } = useWriteContract();
 
   if (!isFrameReady) setFrameReady();
@@ -138,7 +143,6 @@ export default function GiftPage() {
         <input className="border border-neutral-200 rounded-md p-2" placeholder="Category (birthday)" value={category} onChange={(e) => setCategory(e.target.value)} />
         <Button className="bg-neutral-900 text-white cursor-pointer" onClick={createGift} disabled={isConfirming}>Send Gift</Button>
         <div className="flex gap-2">
-          <Button variant="outline" className="cursor-pointer" onClick={() => addFrame().catch(() => {})}>Add to MiniKit</Button>
           <Button variant="outline" className="cursor-pointer" onClick={() => openUrl('https://base.org/builders/minikit')}>Learn MiniKit</Button>
         </div>
       </div>
